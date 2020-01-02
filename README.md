@@ -9,6 +9,9 @@ This module requires:
 pip3 install .
 ```
 
+### Database
+Apply sql/install.sql to desired user (this will create Restaurants table).
+
 ### Configure
 Copy /etc/peopledoc-test/resto.example.ini to /etc/peopledoc-test/resto.ini
 
@@ -33,6 +36,7 @@ https://web.postman.co/collections/9855198-6d064006-9222-486e-af6f-296f89787925?
 - Improve logs.
 - Implement a reload function for the configuration file.
 - Install init.d script (through debian package ?).
+- Create table automatically.
 - Implement profiling.
 - Use sqlalchemy ?
 - Use a gateway for authentication / rate-limiting etc (Kong ?).

@@ -24,7 +24,7 @@ pytest
 /!\ There are deprecation warnings as aiohttp uses deprecated arguments (loop).
 
 ## Documentation:
-https://web.postman.co/collections/9855198-6d064006-9222-486e-af6f-296f89787925?version=latest&workspace=88b07ed0-f43c-4e10-852b-fbab0be77dec
+[Postman documentation](https://documenter.getpostman.com/view/9855198/SWEDzESm)
 
 ### Explorations
 - aiohttp-graphql: https://github.com/graphql-python/aiohttp-graphql

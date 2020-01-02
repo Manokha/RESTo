@@ -1,0 +1,12 @@
+*.pyc
+
+# Ignore build files
+MANIFEST
+build
+dist
+
+# Ignore test files
+.pytest_cache
+
+# Ignore virtualenv
+virtualenv

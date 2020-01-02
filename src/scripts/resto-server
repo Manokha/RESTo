@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import logging
+
+from aiohttp import web
+from argparse import ArgumentParser
+from configparser import ConfigParser
+
+from resto.server import resto_app
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description="resto server")
+    parser.add_argument(
+        "-c", "--configuration",
+        default="/etc/peopledoc-test/resto.ini",
+        help="Configuration file path (default: /etc/peopledoc-test/resto.ini)."
+    )
+    args = parser.parse_args()
+
+    cfg = ConfigParser()
+    cfg.read(args.configuration)
+
+    logging.basicConfig(format='%(asctime)s [%(levelname)s] - %(message)s')
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    logging.getLogger("aiohttp.server").setLevel(logging.DEBUG)
+    logging.getLogger("aiohttp.access").setLevel(logging.DEBUG)
+    logging.getLogger("aiopg").setLevel(logging.DEBUG)
+
+    web.run_app(resto_app(cfg))

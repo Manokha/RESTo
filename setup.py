@@ -17,5 +17,9 @@ setup(
         ('/etc/peopledoc-test', ['config/resto.example.ini']),
     ],
     python_requires='>=3.8',
-    install_requires=['aiohttp[speedups]', 'aiopg', 'pytest-aiohttp'],
+    install_requires=[
+        'aiohttp[speedups]==3.6.2',
+        'aiopg==1.0.0',
+        'pytest-aiohttp==0.3.0'
+    ],
 )

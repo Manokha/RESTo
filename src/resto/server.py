@@ -5,6 +5,7 @@ import aiopg
 from aiohttp import web
 
 from resto.views import RestaurantsView
+from resto.models import PGRestaurants
 
 
 @web.middleware
@@ -18,9 +19,22 @@ async def json_middleware(request, handler):
         )
 
 
+async def create_connection_pool(app):
+    app['pg_pool'] = await aiopg.create_pool(**dict(app['cfg'].items('Database')))
+    app['restaurants'] = PGRestaurants(app['pg_pool'])
+
+
+async def dispose_connection_pool(app):
+    app['pg_pool'].close()
+    await app['pg_pool'].wait_closed()
+
+
 async def resto_app(cfg):
     app = web.Application(middlewares=[json_middleware])
     app['cfg'] = cfg
-    app['pool'] = await aiopg.create_pool(**dict(cfg.items('Database')))
+
+    app.on_startup.append(create_connection_pool)
+    app.on_cleanup.append(dispose_connection_pool)
+
     app.add_routes([web.view('/restaurants', RestaurantsView)])
     return app

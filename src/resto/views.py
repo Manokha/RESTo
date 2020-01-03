@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
-import logging
-
 from aiohttp import web
-from json import decoder, dumps
-from psycopg2.errors import UniqueViolation
+from json import decoder
 
-
-logger = logging.getLogger('resto.views')
-logger.setLevel(logging.DEBUG)
+from resto.exceptions import (
+    ConflictException,
+    NotFoundException
+)
 
 
 class RestaurantsView(web.View):
@@ -29,7 +27,7 @@ class RestaurantsView(web.View):
         if missing:
             raise web.HTTPBadRequest(reason="Mandatory parameter(s) missing: %s." % ", ".join(missing))
 
-    async def _write_single(self, sql):
+    async def _extract_body(self):
         if self.request.body_exists:
             try:
                 args = await self.request.json()
@@ -39,51 +37,41 @@ class RestaurantsView(web.View):
             args = {}
 
         self._check_parameters(args)
-
-        # TODO: propose pull request to aiopg to fix cursor() from pool (no wait in __aenter__ nor __aexit__)
-        async with self.request.app['pool'].acquire() as conn:
-            async with conn.cursor() as cursor:
-                try:
-                    await cursor.execute(sql, args)
-                except UniqueViolation as e:
-                    # TODO: better error handling. This works as long as name is the only unique field.
-                    reason = "A restaurant with that name [%(name)s] already exists." % args
-                    raise web.HTTPConflict(reason="A restaurant with that name [%(name)s] already exists." % args)
-
-                if cursor.rowcount < 1:
-                    # TODO: better error handling. This works as long as name is the only unique field.
-                    raise web.HTTPNotFound(reason="There are no restaurant with that name [%(name)s]." % args)
+        return args
 
     async def delete(self):
-        return await self._write_single("DELETE FROM Restaurants WHERE name = %(name)s")
+        args = await self._extract_body()
+        try:
+            return await self.request.app['restaurants'].delete_by_name(args['name'])
+        except NotFoundException as e:
+            raise web.HTTPNotFound(reason=str(e))
 
     async def get(self):
         args = self.request.query
         self._check_parameters(args)
-        assert_one_result = True
 
-        # TODO: handle retrieved columns
-        if 'name' in args:
-            sql = "SELECT name FROM Restaurants WHERE name = %(name)s"
-        elif 'random' in args:
-            sql = "SELECT name FROM Restaurants LIMIT 1 OFFSET FLOOR(RANDOM() * (SELECT COUNT(*) FROM Restaurants))"
-        else:
-            sql = "SELECT name FROM Restaurants"
-            assert_one_result = False
-
-        # TODO: propose pull request to aiopg to fix cursor() from pool (no wait in __aenter__ nor __aexit__)
-        async with self.request.app['pool'].acquire() as conn:
-            async with conn.cursor() as cursor:
-                await cursor.execute(sql, args)
-                rows = await cursor.fetchall()
-
-        if assert_one_result and len(rows) < 1:
-            raise web.HTTPNotFound(reason="There are no restaurant with that name [%(name)s]." % args)
-
-        return [{'name': name} for name, in rows]
+        try:
+            if 'name' in args:
+                return await self.request.app['restaurants'].read_by_name(args['name'])
+            elif 'random' in args and args['random'].lower() == 'true':
+                return await self.request.app['restaurants'].read_random()
+            else:
+                return await self.request.app['restaurants'].read_all()
+        except NotFoundException as e:
+            raise web.HTTPNotFound(reason=str(e))
 
     async def patch(self):
-        return await self._write_single("UPDATE Restaurants SET name = %(new_name)s WHERE name = %(name)s")
+        args = await self._extract_body()
+        try:
+            return await self.request.app['restaurants'].update_by_name(args['name'], args['new_name'])
+        except NotFoundException as e:
+            raise web.HTTPNotFound(reason=str(e))
+        except ConflictException as e:
+            raise web.HTTPConflict(reason=str(e))
 
     async def post(self):
-        return await self._write_single("INSERT INTO Restaurants (name) VALUES (%(name)s)")
+        args = await self._extract_body()
+        try:
+            return await self.request.app['restaurants'].create(args['name'])
+        except ConflictException as e:
+            raise web.HTTPConflict(reason=str(e))

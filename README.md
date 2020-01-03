@@ -23,6 +23,28 @@ pytest
 ```
 /!\ There are deprecation warnings as aiohttp uses deprecated arguments (loop).
 
+## Launch:
+### Help:
+```
+$ resto-server --help
+usage: resto-server [-h] [-c CONFIGURATION]
+
+resto server
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIGURATION, --configuration CONFIGURATION
+                        Configuration file path (default: /etc/peopledoc-test/resto.ini).
+```
+
+### Examples:
+```sh
+resto-server
+```
+```sh
+resto-server -c test-resto.ini
+```
+
 ## Documentation:
 [Postman documentation](https://documenter.getpostman.com/view/9855198/SWEDzESm)
 

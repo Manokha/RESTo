@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  db:
+    image: postgres:12.1
+  web:
+    build: .
+    command: resto-server
+    volumes:
+      - .:/code
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db

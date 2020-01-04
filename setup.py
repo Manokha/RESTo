@@ -13,9 +13,6 @@ setup(
     scripts=[
         'src/scripts/resto-server',
     ],
-    data_files=[
-        ('/etc/peopledoc-test', ['config/resto.example.ini']),
-    ],
     python_requires='>=3.8',
     install_requires=[
         'aiohttp[speedups]==3.6.2',

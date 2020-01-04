@@ -168,5 +168,33 @@ async def test_delete_another(client):
     assert await resp.json() is None
 
 
+async def test_create_special_characters(client):
+    # TODO: / and # characters must be url encoded when used in url (get / patch / delete)
+    # Test all special characters.
+    resp = await client.post(
+        '/restaurants',
+        json={'name': '^$€|!§ \' " < ~ (àéîøù)'}
+    )
+    assert resp.status == 200
+    assert await resp.json() is None
+
+
+async def test_read_all_special_characters(client):
+    await check_names(client, ['^$€|!§ \' " < ~ (àéîøù)'])
+
+
+async def test_read_one_special_characters(client):
+    resp = await client.get('/restaurants/^$€|!§ \' " < ~ (àéîøù)')
+    assert resp.status == 200
+    assert len(await resp.json()) == 1
+    assert (await resp.json())[0]['name'] == '^$€|!§ \' " < ~ (àéîøù)'
+
+
+async def test_delete_special_characters(client):
+    resp = await client.delete('/restaurants/^$€|!§ \' " < ~ (àéîøù)')
+    assert resp.status == 200
+    assert await resp.json() is None
+
+
 async def test_read_all_empty_final(client):
     await check_names(client, [])

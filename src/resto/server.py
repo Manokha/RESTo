@@ -36,5 +36,8 @@ async def resto_app(cfg):
     app.on_startup.append(create_connection_pool)
     app.on_cleanup.append(dispose_connection_pool)
 
-    app.add_routes([web.view('/restaurants', RestaurantsView)])
+    app.add_routes([
+        web.view('/restaurants', RestaurantsView),
+        web.view('/restaurants/{name}', RestaurantsView)
+    ])
     return app

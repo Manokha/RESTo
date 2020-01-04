@@ -34,7 +34,7 @@ async def test_read_all_empty(client):
 
 
 async def test_read_not_found(client):
-    resp = await client.get('/restaurants', params={'name': "I don't exist"})
+    resp = await client.get("/restaurants/I don't exist")
     assert resp.status == 404
     assert 'error' in await resp.json()
 
@@ -76,7 +76,7 @@ async def test_create_bad_json(client):
 
 
 async def test_read_one(client):
-    resp = await client.get('/restaurants', params={'name': 'test_one'})
+    resp = await client.get('/restaurants/test_one')
     assert resp.status == 200
     assert len(await resp.json()) == 1
     assert (await resp.json())[0]['name'] == 'test_one'
@@ -95,19 +95,19 @@ async def test_read_all_after_creates(client):
 
 
 async def test_update_one(client):
-    resp = await client.patch('/restaurants', json={'name': 'test_one', 'new_name': 'test_one_updated'})
+    resp = await client.patch('/restaurants/test_one', json={'name': 'test_one_updated'})
     assert resp.status == 200
     assert await resp.json() is None
 
 
 async def test_update_duplicate(client):
-    resp = await client.patch('/restaurants', json={'name': 'test_two', 'new_name': 'test_one_updated'})
+    resp = await client.patch('/restaurants/test_two', json={'name': 'test_one_updated'})
     assert resp.status == 409  # Conflict
     assert 'error' in await resp.json()
 
 
 async def test_update_not_found(client):
-    resp = await client.patch('/restaurants', json={'name': "I don't exist", 'new_name': "I should'nt exist"})
+    resp = await client.patch("/restaurants/I don't exist", json={'name': "I should'nt exist"})
     assert resp.status == 404
     assert 'error' in await resp.json()
 
@@ -119,19 +119,19 @@ async def test_update_no_param(client):
 
 
 async def test_update_bad_json(client):
-    resp = await client.patch('/restaurants', data=b'not a valid json')
+    resp = await client.patch('/restaurants/test_two', data=b'not a valid json')
     assert resp.status == 400
     assert 'error' in await resp.json()
 
 
 async def test_update_no_name(client):
-    resp = await client.patch('/restaurants', json={'new_name': "I shouldn't exist"})
+    resp = await client.patch('/restaurants', json={'name': "I shouldn't exist"})
     assert resp.status == 400
     assert 'error' in await resp.json()
 
 
 async def test_update_no_new_name(client):
-    resp = await client.patch('/restaurants', json={'name': 'test_two'})
+    resp = await client.patch('/restaurants/test_two')
     assert resp.status == 400
     assert 'error' in await resp.json()
 
@@ -141,13 +141,13 @@ async def test_read_all_after_updates(client):
 
 
 async def test_delete_one(client):
-    resp = await client.delete('/restaurants', json={'name': 'test_one_updated'})
+    resp = await client.delete('/restaurants/test_one_updated')
     assert resp.status == 200
     assert await resp.json() is None
 
 
 async def test_delete_not_found(client):
-    resp = await client.delete('/restaurants', json={'name': "I don't exist"})
+    resp = await client.delete("/restaurants/I don't exist")
     assert resp.status == 404
     assert 'error' in await resp.json()
 
@@ -163,15 +163,9 @@ async def test_read_all_after_first_delete(client):
 
 
 async def test_delete_another(client):
-    resp = await client.delete('/restaurants', json={'name': 'test_two'})
+    resp = await client.delete('/restaurants/test_two')
     assert resp.status == 200
     assert await resp.json() is None
-
-
-async def test_delete_bad_json(client):
-    resp = await client.delete('/restaurants', data=b'not a valid json')
-    assert resp.status == 400
-    assert 'error' in await resp.json()
 
 
 async def test_read_all_empty_final(client):

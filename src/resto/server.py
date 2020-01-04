@@ -21,6 +21,9 @@ async def json_middleware(request, handler):
 
 async def create_connection_pool(app):
     app['pg_pool'] = await aiopg.create_pool(**dict(app['cfg'].items('Database')))
+
+
+async def create_collections(app):
     app['restaurants'] = PGRestaurants(app['pg_pool'])
 
 
@@ -34,6 +37,7 @@ async def resto_app(cfg):
     app['cfg'] = cfg
 
     app.on_startup.append(create_connection_pool)
+    app.on_startup.append(create_collections)
     app.on_cleanup.append(dispose_connection_pool)
 
     app.add_routes([

@@ -5,26 +5,45 @@ This module requires:
 - a python 3.8 installation.
 
 ## Install:
+### Using docker compose:
+```sh
+docker-compose build web
+```
+
+### Manually:
+#### App
 ```sh
 pip3 install .
 ```
 
-### Database
+#### Database
 Apply sql/install.sql to desired user (this will create Restaurants table).
 
-### Configure
+#### Configure
 Copy /etc/peopledoc-test/resto.example.ini to /etc/peopledoc-test/resto.ini
 
 Set postgresql connection informations. You're set !
 
-## Test:
-```sh
-pytest
-```
-/!\ There are deprecation warnings as aiohttp uses deprecated arguments (loop).
-
 ## Launch:
-### Help:
+### Using docker compose:
+#### App
+```sh
+docker-compose up web
+```
+<aside class="notice">
+On my machine, the first time I run this command, the web docker starts "too fast" and tries to connect to the "db" one that is not yet ready.
+If the db is already up, it's fine.
+TODO: workaround.
+<aside>
+
+#### Tests
+```sh
+docker-compose run web pytest
+```
+
+### Manually:
+#### App:
+##### Help:
 ```
 $ resto-server --help
 usage: resto-server [-h] [-c CONFIGURATION]
@@ -37,12 +56,17 @@ optional arguments:
                         Configuration file path (default: /etc/peopledoc-test/resto.ini).
 ```
 
-### Examples:
+##### Examples:
 ```sh
 resto-server
 ```
 ```sh
 resto-server -c test-resto.ini
+```
+
+#### Tests:
+```sh
+pytest
 ```
 
 ## Documentation:
@@ -58,11 +82,9 @@ resto-server -c test-resto.ini
 - Improve logs.
 - Implement a reload function for the configuration file.
 - Install init.d script (through debian package ?).
-- Create table automatically.
 - Implement profiling.
 - Use sqlalchemy ?
 - Use a gateway for authentication / rate-limiting etc (Kong ?).
 - Make restaurant name the last part of url instead of a standard parameter, github style.
 - Handle web handler cancellation using asyncio.shield (https://docs.aiohttp.org/en/stable/web_advanced.html#web-handler-cancellation).
-- Package using docker or .deb or both.
 - Test python 3.6 compatibility for pypy, then pypy and check performance gains.

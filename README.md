@@ -85,6 +85,5 @@ pytest
 - Implement profiling.
 - Use sqlalchemy ?
 - Use a gateway for authentication / rate-limiting etc (Kong ?).
-- Make restaurant name the last part of url instead of a standard parameter, github style.
 - Handle web handler cancellation using asyncio.shield (https://docs.aiohttp.org/en/stable/web_advanced.html#web-handler-cancellation).
 - Test python 3.6 compatibility for pypy, then pypy and check performance gains.

@@ -64,6 +64,8 @@ class RestaurantsView(web.View):
 
     async def post(self):
         args = await self._extract_args()
+        if len(args['name']) > 255:
+            raise web.HTTPBadRequest(reason="Name can't exceed 255 characters.")
 
         try:
             return await self.request.app['restaurants'].create(args['name'])

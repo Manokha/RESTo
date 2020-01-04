@@ -196,5 +196,23 @@ async def test_delete_special_characters(client):
     assert await resp.json() is None
 
 
+async def test_create_max_characters(client):
+    resp = await client.post('/restaurants', json={'name': 'a' * 255})
+    assert resp.status == 200
+    assert await resp.json() is None
+
+
+async def test_create_too_much_characters(client):
+    resp = await client.post('/restaurants', json={'name': 'a' * 256})
+    assert resp.status == 400
+    assert 'error' in await resp.json()
+
+
+async def test_delete_max_characters(client):
+    resp = await client.delete('/restaurants/' + 'a' * 255)
+    assert resp.status == 200
+    assert await resp.json() is None
+
+
 async def test_read_all_empty_final(client):
     await check_names(client, [])

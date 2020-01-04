@@ -30,11 +30,11 @@ Set postgresql connection informations. You're set !
 ```sh
 docker-compose up web
 ```
-<aside class="notice">
-On my machine, the first time I run this command, the web docker starts "too fast" and tries to connect to the "db" one that is not yet ready.
+
+:warning: On my machine, the first time I run this command, the web docker starts "too fast" and tries to connect to the "db" one that is not yet ready.
 If the db is already up, it's fine.
+
 TODO: workaround.
-<aside>
 
 #### Tests
 ```sh
